@@ -40,7 +40,7 @@ final class NeonDictionary extends Dictionary
 			throw NeonDictionaryException::fileNotFound($filename);
 		}
 
-        if ($fallbackFilename && !is_file($fallbackFilename)) {
+        if ($fallbackFilename && !\is_file($fallbackFilename)) {
 
             throw NeonDictionaryException::fileNotFound($fallbackFilename);
         }
@@ -56,7 +56,7 @@ final class NeonDictionary extends Dictionary
 	{
 		if (!$this->isReady()) {
 
-			if (is_file($this->cacheFilename)) {
+			if (\is_file($this->cacheFilename)) {
 
 				// load cache
 				$this->setMessages(require $this->cacheFilename);
@@ -65,21 +65,45 @@ final class NeonDictionary extends Dictionary
 
                 // load translations from neon file
                 $fallbackDecoded = Neon::decode(file_get_contents($this->fallbackFilename));
-                $fallbackTranslations = is_array($fallbackDecoded) ? $fallbackDecoded: [];
+                $fallbackTranslations = \is_array($fallbackDecoded) ? $fallbackDecoded: [];
 
 			    // load translations from neon file
 				$decoded = Neon::decode(file_get_contents($this->filename));
-				$translations = is_array($decoded) ? $decoded: [];
+				$translations = \is_array($decoded) ? $decoded: [];
 
 				$translations = \array_merge($fallbackTranslations, $translations);
 
+				$translations = $this->parse($translations);
+
 				// save cache
-				$content = '<?php ' . PHP_EOL . 'return ' . var_export($translations, true) . ';' . PHP_EOL;
-				file_put_contents("safe://$this->cacheFilename", $content);
+				$content = '<?php ' . PHP_EOL . 'return ' . \var_export($translations, true) . ';' . PHP_EOL;
+				\file_put_contents("safe://$this->cacheFilename", $content);
 
 				$this->setMessages($translations);
 			}
 		}
 	}
+
+	protected function parse(array $translations)
+    {
+        foreach ($translations as &$translation) {
+            if (\is_array($translation)) {
+                foreach ($translation as $key => $value) {
+                    if (\is_string($key)) {
+                        if (\preg_match('/^(\d+)-(\d+)$/iu', $key, $matches)) {
+                            if (\count($matches) === 3) {
+                                for ($i = $matches[1]; $i <= $matches[2]; $i++) {
+                                    $translation[$i] = $value;
+                                }
+                                unset($translation[$key]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $translations;
+    }
 
 }

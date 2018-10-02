@@ -141,31 +141,13 @@ final class Translator implements TranslatorInterface
 
 				if ($count === null) {
 					$this->warn('Multiple plural forms are available (message: %s), but the $count is null.', $message);
+
+					// fallback to highest
+                    $count = \max(array_keys($translation));
 				}
 
-				// choose the right plural form based on count
-				$form = 0;
-				if ($count !== null) {
-					// special zero
-					if ($count === 0 && \array_key_exists(self::ZERO_INDEX, $translation)) {
-						$form = self::ZERO_INDEX;
-					} else {
-						$form = $this->plural($count);
-					}
-				}
-
-				if (!\array_key_exists($form, $translation)) {
-					$this->warn('Plural form not defined. (message: %s, form: %s)', $message, $form);
-				}
-
-				// fallback form
-				if ($count === null || !\array_key_exists($form, $translation)) {
-					\end($translation);
-					$form = \key($translation);
-				}
-
-				// custom plural form translation
-				$result = $translation[$form];
+				$t = new Translation($translation);
+				$result = $t->get($count);
 
 			}
 
@@ -231,56 +213,6 @@ final class Translator implements TranslatorInterface
 
 		return $message;
 	}
-
-
-	private function plural(int $n): int
-	{
-		switch ($this->locale) {
-			// english (compatible)
-			default:
-				return $n === 1 ? 0 : 1;
-			case 'id_ID': // indonesian
-			case 'ja_JP': // japanese
-			case 'ka_GE': // georgian
-			case 'ko_KR': // korean
-			case 'lo_LA': // lao
-			case 'ms_MY': // malay
-			case 'my_MM': // burmese
-			case 'th_TH': // thai
-			case 'vi_VN': // vietnam
-			case 'zh_CN': // chinese (simplified)
-				return 0;
-			case 'fr_FR': // french
-			case 'tr_TR': // turkish
-			case 'uz_UZ': // uzbek
-				return $n > 1 ? 1 : 0;
-			case 'cr_CR': // croatian
-			case 'ru_RU': // russian
-			case 'uk_UA': // ukrainian
-				return $n % 10 == 1 && $n % 100 !== 11 ? 0 : ($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20) ? 1 : 2);
-			case 'cs_CZ': // czech
-				return $n === 1 ? 0 : (($n >= 2 && $n <= 4) ? 1 : 2);
-			case 'is_IS': // icelandic
-				return ($n % 10 !== 1 || $n % 100 == 11) ? 1 : 0;
-			case 'lt_LT': // lithuanian
-				return $n % 10 == 1 && $n % 100 !== 11 ? 0 : ($n % 10 >= 2 && ($n % 100 < 10 or $n % 100 >= 20) ? 1 : 2);
-			case 'lv_LV': // latvian
-				return ($n % 10 === 1 && $n % 100 !== 11) ? 0 : ($n !== 0 ? 1 : 2);
-			case 'mk_MK': // macedonian
-				return $n == 1 || $n % 10 == 1 ? 0 : 1;
-			case 'mt_MT': // maltese
-				return $n == 1 ? 0 : ($n == 0 || ($n % 100 > 1 && $n % 100 < 11) ? 1 : (($n % 100 > 10 && $n % 100 < 20) ? 2 : 3));
-			case 'pl_PL': // polish
-				return $n == 1 ? 0 : ($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || ($n % 100 >= 20)) ? 1 : 2);
-			case 'sk_SK': // slovak
-				return $n == 1 ? 0 : ($n >= 2 && $n <= 4 ? 1 : 2);
-			case 'sl_SL': // slovenian
-				return $n % 100 == 1 ? 0 : ($n % 100 == 2 ? 1 : ($n % 100 == 3 || $n % 100 == 4 ? 2 : 3));
-			case 'ro_RO': // romanian
-				return $n == 1 ? 0 : (($n == 0 || ($n % 100 > 0 && $n % 100 < 20)) ? 1 : 2);
-		}
-	}
-
 
 	public function setLogger(LoggerInterface $logger)
 	{

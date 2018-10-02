@@ -11,8 +11,29 @@ namespace ElCheco\Translator;
 
 class Translation
 {
+    /**
+     * @var string
+     */
+    protected $translation;
+
+    /**
+     * @var int
+     */
+    protected $max;
+
     public function __construct(array $translation)
     {
-
+        $this->translation = $translation;
+        $this->max = \max(\array_keys($translation));
     }
+
+    public function get(int $count)
+    {
+        if (isset($this->translation[$count])) {
+            return $this->translation[$count];
+        } else {
+            return $this->translation[$this->max];
+        }
+    }
+
 }
