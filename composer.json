@@ -1,0 +1,30 @@
+{
+  "name": "elcheco/translator",
+  "type": "library",
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.2",
+    "ext-intl": "*",
+    "ext-tokenizer": "*",
+    "nette/di": "^2.4",
+    "nette/neon": "v3.0.0-beta1",
+    "nette/safe-stream": "^2.3",
+    "nette/utils": "^2.5",
+    "psr/log": "^1.0"
+  },
+  "require-dev": {
+    "nette/tester": "^2.0",
+    "mockery/mockery": "^1.0@dev",
+    "phpstan/phpstan": "^0.9.0@dev"
+  },
+  "suggest": {
+    "monolog/monolog": "To log translation errors."
+  },
+  "autoload": {
+    "psr-4": {
+      "ElCheco\\": [
+        "src"
+      ]
+    }
+  }
+}

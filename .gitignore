@@ -1,0 +1,4 @@
+tests/temp
+vendor
+composer.lock
+.idea/
