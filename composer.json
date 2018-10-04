@@ -1,7 +1,16 @@
 {
   "name": "elcheco/translator",
+  "description": "Translation system using neon files, supports plurals and string replacements, fallback language. Extension to Nette Framework ^2.4",
   "type": "library",
+  "license": ["BSD-3-Clause"],
+  "authors": [
+    {
+      "name": "Miroslav Koula",
+      "email": "mkoula@gmail.com"
+    }
+  ],
   "minimum-stability": "dev",
+  "prefer-stable": true,
   "require": {
     "php": ">=7.2",
     "ext-intl": "*",
