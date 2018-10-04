@@ -6,6 +6,11 @@ Translator
 Lightweight and powerful translation system for PHP 7.2+, build as component 
 not only for [Nette](https://nette.org) framework
 
+Note: 
+Inspired by [rostenkowski/translate](https://github.com/rostenkowski/translate), but I needed support for Nette Framework ^2.4
+and fallback translation possibility. I also refactored a bit the plurals to be naturally understandable. 
+
+## Install
 ```bash
 composer require elcheco/translator
 ```
