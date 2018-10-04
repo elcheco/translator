@@ -1,7 +1,7 @@
 Translator 
 --
 [![Downloads this Month](https://img.shields.io/packagist/dm/elcheco/translator.svg)](https://packagist.org/packages/elcheco/translator)
-[![License](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://github.com/elcheco/translator/blob/master/license)
+[![License](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://github.com/elcheco/translator/blob/master/LICENSE)
 
 Lightweight and powerful translation system for PHP 7.2+, build as component 
 not only for [Nette](https://nette.org) framework
