@@ -16,7 +16,7 @@
     "ext-intl": "*",
     "ext-tokenizer": "*",
     "nette/di": "^2.4",
-    "nette/neon": "v3.0.0-beta1",
+    "nette/neon": "^3.0",
     "nette/safe-stream": "^2.3",
     "nette/utils": "^2.5",
     "psr/log": "^1.0"
