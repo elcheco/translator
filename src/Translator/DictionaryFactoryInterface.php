@@ -13,6 +13,6 @@ namespace ElCheco\Translator;
 interface DictionaryFactoryInterface
 {
 
-	public function create(string $locale, ?string $fallbackLocale): DictionaryInterface;
+	public function create(string $locale, ?string $fallbackLocale = null): DictionaryInterface;
 
 }

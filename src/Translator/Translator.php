@@ -9,24 +9,11 @@ declare(strict_types=1);
 
 namespace ElCheco\Translator;
 
-
 use NumberFormatter;
 use Psr\Log\LoggerInterface;
-use function array_key_exists;
-use function array_shift;
-use function end;
-use function func_get_args;
-use function gettype;
-use function is_numeric;
-use function is_object;
-use function key;
-use function method_exists;
-use function sprintf;
 
 final class Translator implements TranslatorInterface
 {
-
-
 	private const ZERO_INDEX = -1;
 
 	/**
@@ -46,9 +33,9 @@ final class Translator implements TranslatorInterface
     /**
      * fallback locale
      *
-     * @var string
+     * @var null|string
      */
-    private $fallBackLocale = 'en_US';
+    private $fallBackLocale;
 
 	/**
 	 * @var DictionaryInterface|null
@@ -100,12 +87,16 @@ final class Translator implements TranslatorInterface
     }
 
 
-	public function translate($message, $count = null)
+	public function translate($message, ...$parameters): string
 	{
 		// avoid processing for empty values
 		if ($message === null || $message === '') {
 			return '';
 		}
+
+        if (!isset($parameters[0])) {
+            $parameters[0] = null;
+        }
 
 		// convert to string
 		if (\is_object($message) && \method_exists($message, '__toString')) {
@@ -114,7 +105,7 @@ final class Translator implements TranslatorInterface
 
 		// numbers are formatted using locale settings (count parameter is used to define decimals)
 		if (\is_numeric($message)) {
-			return $this->formatNumber($message, (int) $count);
+			return $this->formatNumber($message, (int) $parameters['count']);
 		}
 
 		// check message to be string
@@ -139,15 +130,15 @@ final class Translator implements TranslatorInterface
 			// process plural
 			if (\is_array($translation)) {
 
-				if ($count === null) {
+				if ((isset($parameters[0]) && $parameters[0] === null)) {
 					$this->warn('Multiple plural forms are available (message: %s), but the $count is null.', $message);
 
 					// fallback to highest
-                    $count = \max(array_keys($translation));
+                    $parameters[0] = \max(\array_keys($translation));
 				}
 
 				$t = new Translation($translation);
-				$result = $t->get($count);
+				$result = $t->get($parameters[0]);
 
 			}
 
@@ -157,24 +148,18 @@ final class Translator implements TranslatorInterface
 			}
 		}
 
-		// process parameters
-		$args = \func_get_args();
-
-		// remove message
-		\array_shift($args);
-
 		// remove count if not provided or explicitly set to null
-		if ($count === null) {
-			\array_shift($args);
+		if ($parameters[0] === null) {
+			\array_shift($parameters);
 		}
 
-		if (\count($args)) {
+		if (\count($parameters)) {
 
 			// preserve some nette placeholders
 			$template = \str_replace(['%label', '%name', '%value'], ['%%label', '%%name', '%%value'], $result);
 
 			// apply parameters
-			$result = \vsprintf($template, $args);
+			$result = \vsprintf($template, $parameters);
 		}
 
 		return $result;

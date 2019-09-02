@@ -9,14 +9,11 @@ declare(strict_types=1);
 
 namespace ElCheco\Translator\NeonDictionary;
 
-
-use function is_array;
 use Nette\Neon\Neon;
 use ElCheco\Translator\Dictionary;
 
 final class NeonDictionary extends Dictionary
 {
-
 	/**
 	 * @var string
 	 */
@@ -35,19 +32,16 @@ final class NeonDictionary extends Dictionary
 
 	public function __construct(string $filename, string $cacheFilename, ?string $fallbackFilename = null)
 	{
-		if (!is_file($filename)) {
-
+		if (!\is_file($filename)) {
 			throw NeonDictionaryException::fileNotFound($filename);
 		}
 
         if ($fallbackFilename && !\is_file($fallbackFilename)) {
-
             throw NeonDictionaryException::fileNotFound($fallbackFilename);
         }
 
 		$this->filename = $filename;
 		$this->cacheFilename = $cacheFilename;
-
         $this->fallbackFilename = $fallbackFilename;
 	}
 
@@ -64,14 +58,18 @@ final class NeonDictionary extends Dictionary
 			} else {
 
                 // load translations from neon file
-                $fallbackDecoded = Neon::decode(file_get_contents($this->fallbackFilename));
-                $fallbackTranslations = \is_array($fallbackDecoded) ? $fallbackDecoded: [];
+                if ($this->fallbackFilename) {
+                    $fallbackDecoded = Neon::decode(\file_get_contents($this->fallbackFilename));
+                    $fallbackTranslations = \is_array($fallbackDecoded) ? $fallbackDecoded : [];
+                }
 
 			    // load translations from neon file
-				$decoded = Neon::decode(file_get_contents($this->filename));
+				$decoded = Neon::decode(\file_get_contents($this->filename));
 				$translations = \is_array($decoded) ? $decoded: [];
 
-				$translations = \array_merge($fallbackTranslations, $translations);
+                if ($this->fallbackFilename) {
+                    $translations = \array_merge($fallbackTranslations, $translations);
+                }
 
 				$translations = $this->parse($translations);
 
@@ -84,7 +82,7 @@ final class NeonDictionary extends Dictionary
 		}
 	}
 
-	protected function parse(array $translations)
+	protected function parse(array $translations): array
     {
         foreach ($translations as &$translation) {
             if (\is_array($translation)) {

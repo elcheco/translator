@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace ElCheco\Translator;
 
-
 use Nette\DI\CompilerExtension;
 use Nette\DI\Helpers;
 use ElCheco\Translator\NeonDictionary\NeonDictionaryFactory;
