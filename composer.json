@@ -1,6 +1,6 @@
 {
   "name": "elcheco/translator",
-  "description": "Translation system using neon files, supports plurals and string replacements, fallback language. Extension to Nette Framework ^2.4",
+  "description": "Translation system using neon files, supports plurals and string replacements, fallback language. Extension to Nette Framework ^3.0",
   "type": "library",
   "license": ["BSD-3-Clause"],
   "authors": [
@@ -12,22 +12,19 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=7.2",
+    "php": ">=7.3",
     "ext-intl": "*",
     "ext-tokenizer": "*",
-    "nette/di": "^2.4",
+    "nette/di": "^3.0",
     "nette/neon": "^3.0",
-    "nette/safe-stream": "^2.3",
-    "nette/utils": "^2.5",
+    "nette/safe-stream": "^2.4",
+    "nette/utils": "^3.0",
     "psr/log": "^1.0"
   },
   "require-dev": {
     "nette/tester": "^2.0",
-    "mockery/mockery": "^1.0@dev",
-    "phpstan/phpstan": "^0.9.0@dev"
-  },
-  "suggest": {
-    "monolog/monolog": "To log translation errors."
+    "mockery/mockery": "^1.2",
+    "phpstan/phpstan": "^0.11.8"
   },
   "autoload": {
     "psr-4": {

@@ -38,7 +38,7 @@ abstract class Dictionary implements DictionaryInterface
 	abstract protected function lazyLoad();
 
 
-	protected function isReady()
+	protected function isReady(): bool
 	{
 		return is_array($this->messages);
 	}

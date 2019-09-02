@@ -2,7 +2,6 @@
 
 namespace ElCheco\Translator;
 
-
 use Exception;
 
 class TranslatorException extends Exception

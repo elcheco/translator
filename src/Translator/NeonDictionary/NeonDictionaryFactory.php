@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace ElCheco\Translator\NeonDictionary;
 
-
 use ElCheco\Translator\DictionaryFactoryInterface;
 use ElCheco\Translator\DictionaryInterface;
 
@@ -29,14 +28,14 @@ final class NeonDictionaryFactory implements DictionaryFactoryInterface
 
 	public function __construct(string $directory, string $cacheDir, int $cacheDirMode = 0775)
 	{
-		if (!is_dir($directory)) {
+		if (!\is_dir($directory)) {
 
 			throw NeonDictionaryException::translationDirNotFound($directory);
 		}
 
 		$this->directory = $directory;
 
-		if (!is_dir($cacheDir) && @!mkdir($cacheDir, $cacheDirMode, true) || !is_writable($cacheDir)) {
+		if (!\is_dir($cacheDir) && @!\mkdir($cacheDir, $cacheDirMode, true) || !\is_writable($cacheDir)) {
 
 			throw NeonDictionaryException::cacheDirIsNotWritable($cacheDir);
 		}
@@ -45,7 +44,7 @@ final class NeonDictionaryFactory implements DictionaryFactoryInterface
 	}
 
 
-	public function create(string $locale, ?string $fallbackLocale): DictionaryInterface
+	public function create(string $locale, ?string $fallbackLocale = null): DictionaryInterface
 	{
 		$sourceFile = "$this->directory/$locale.neon";
 		$cacheFile = "$this->cacheDir/$locale.php";
