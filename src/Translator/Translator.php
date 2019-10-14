@@ -104,7 +104,7 @@ final class Translator implements TranslatorInterface
 		}
 
 		// numbers are formatted using locale settings (count parameter is used to define decimals)
-		if (\is_numeric($message)) {
+		if (\is_numeric($message) && isset($parameters['count'])) {
 			return $this->formatNumber($message, (int) $parameters['count']);
 		}
 
