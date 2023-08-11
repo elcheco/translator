@@ -75,7 +75,7 @@ final class NeonDictionary extends Dictionary
 
 				// save cache
 				$content = '<?php ' . PHP_EOL . 'return ' . \var_export($translations, true) . ';' . PHP_EOL;
-				\file_put_contents("safe://$this->cacheFilename", $content);
+				\file_put_contents("file://$this->cacheFilename", $content);
 
 				$this->setMessages($translations);
 			}
