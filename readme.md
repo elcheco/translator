@@ -3,11 +3,11 @@ Translator
 [![Downloads this Month](https://img.shields.io/packagist/dm/elcheco/translator.svg)](https://packagist.org/packages/elcheco/translator)
 [![License](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://github.com/elcheco/translator/blob/master/LICENSE)
 
-Lightweight and powerful translation system for PHP 7.2+, build as component 
+Lightweight and powerful translation system for PHP 8.0+, build as component 
 not only for [Nette](https://nette.org) framework
 
 Note: 
-Inspired by [rostenkowski/translate](https://github.com/rostenkowski/translate), but I needed support for Nette Framework ^2.4
+Inspired by [rostenkowski/translate](https://github.com/rostenkowski/translate), but I needed support for Nette Framework ^3.2|^4.0
 and fallback translation possibility. I also refactored a bit the plurals to be naturally understandable. 
 
 ## Install
@@ -53,7 +53,7 @@ extensions:
   translate: ElCheco\Translator\Extension
   
 # configuration
-translate:
+translator:
   default: en_US
   fallback: cs_CZ
 ```
@@ -78,7 +78,7 @@ $translator->translate('Welcome!');
 
 ## Requirements
 
-- PHP 7.2+
+- PHP 8.0+
 - nette/di
 - nette/neon
 - nette/safe-stream
