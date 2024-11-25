@@ -53,7 +53,7 @@ final class Translator implements TranslatorInterface
 	private $logger;
 
 
-	public function __construct(DictionaryFactoryInterface $dictionaryFactory, LoggerInterface $logger = null, $debugMode = false)
+	public function __construct(DictionaryFactoryInterface $dictionaryFactory, ?LoggerInterface $logger = null, $debugMode = false)
 	{
 		$this->dictionaryFactory = $dictionaryFactory;
 		$this->logger = $logger;
