@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+// ini_set('memory_limit', '512M');
+
+require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../app/Bootstrap.php';
+
+exit(App\Bootstrap::boot()
+    ->createContainer()
+    ->getByType(Contributte\Console\Application::class)
+    ->run());

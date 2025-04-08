@@ -1,0 +1,30 @@
+# Czech translations
+
+Welcome!: Vítejte!
+
+Hello %s!: Ahoj %s!
+
+You have %s unread messages.:
+	1: Máte %s nepřečtenou zprávu.
+	2: Máte %s nepřečtené zprávy.
+	5: Máte %s nepřečtených zpráv.
+
+You have %s seconds:
+	0: Čas vypršel
+	1: Máte 1 vteřinu
+	2: Máte %s vteřiny
+	5: Máte %s vteřin
+
+%s bedrooms:
+	0: žádná ložnice
+	"1-4": %s ložnice
+	5: %s ložnic
+
+Article author: Autor článku
+
+User profile updated: Váš profil byl úspěšně aktualizován.
+
+# Longer text example
+Privacy policy intro: >
+    Tyto Zásady ochrany osobních údajů popisují, jak jsou vaše osobní údaje
+	shromažďovány, používány a sdíleny, když navštívíte nebo nakoupíte na našem webu.

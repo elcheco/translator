@@ -1,0 +1,27 @@
+# English translations
+
+Welcome!: Welcome!
+
+Hello %s!: Hello %s!
+
+You have %s unread messages.:
+	1: You have %s unread message.
+	2: You have %s unread messages.
+
+You have %s seconds:
+	0: Time expired
+	1: You have 1 second
+	2: You have %s seconds
+
+%s bedrooms:
+	1: %s bedroom
+	2: %s bedrooms
+
+Article author: Article author
+
+User profile updated: Your profile has been updated successfully.
+
+# Longer text example
+Privacy policy intro: >
+    This Privacy Policy describes how your personal information is collected,
+	used, and shared when you visit or make a purchase from our website.

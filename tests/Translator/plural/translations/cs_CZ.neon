@@ -1,0 +1,4 @@
+%s bedrooms:
+	0: žádná ložnice
+	"1-4": %s ložnice
+	5: %s ložnic

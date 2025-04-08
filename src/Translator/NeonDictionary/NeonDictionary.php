@@ -1,7 +1,7 @@
 <?php
 /**
  * @author    Miroslav Koula
- * @copyright Copyright (c) 2018 Miroslav Koula, https://elcheco.it
+ * @copyright Copyright (c) 2018 Miroslav Koula, https://koula.eu
  * @created  01/10/18 14:02
  */
 
@@ -46,7 +46,7 @@ final class NeonDictionary extends Dictionary
 	}
 
 
-	protected function lazyLoad()
+	protected function lazyLoad(): void
 	{
 		if (!$this->isReady()) {
 

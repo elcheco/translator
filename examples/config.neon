@@ -1,0 +1,71 @@
+# ElCheco Translator Configuration Examples
+
+# Example 1: Basic configuration with NEON dictionary
+translatorNeon:
+	extensions:
+		translator: ElCheco\Translator\Extension
+
+	translator:
+		default: en_US
+		fallback: en_US
+		debugMode: %debugMode%
+		dictionary:
+			factory: ElCheco\Translator\NeonDictionary\NeonDictionaryFactory
+			args:
+				directory: %appDir%/translations
+				cache: %tempDir%/cache/translations
+				autoRefresh: %debugMode%
+
+# Example 2: Database dictionary with command registration
+translatorDb:
+	extensions:
+		translator: ElCheco\Translator\Extension
+
+	translator:
+		default: cs_CZ
+		fallback: en_US
+		dictionary:
+			factory: ElCheco\Translator\DbDictionary\DbDictionaryFactory
+			args:
+				- @database.default
+				- Website
+				- true
+		commands:
+			- ElCheco\Translator\Console\ImportNeonTranslationsCommand(@database.default)
+			- ElCheco\Translator\Console\ExportNeonTranslationsCommand(@database.default)
+
+# Example 3: Minimal configuration with defaults
+translatorMinimal:
+	extensions:
+		translator: ElCheco\Translator\Extension
+
+	translator:
+		default: en_US
+		dictionary:
+			factory: ElCheco\Translator\NeonDictionary\NeonDictionaryFactory
+
+# Example 4: Advanced configuration with custom services
+translatorAdvanced:
+	extensions:
+		translator: ElCheco\Translator\Extension
+
+	translator:
+		default: de_DE
+		fallback: en_US
+		debugMode: %debugMode%
+		dictionary:
+			factory: ElCheco\Translator\DbDictionary\DbDictionaryFactory
+			args:
+				- @customDatabaseConnection
+				- Frontend
+				- true
+		commands:
+			- @translationCommandsFactory::createImportCommand
+			- @translationCommandsFactory::createExportCommand
+
+	services:
+		customDatabaseConnection:
+			factory: Dibi\Connection(%database%)
+
+		translationCommandsFactory:
+			factory:  ElCheco\Translator\Console\TranslationCommandsFactory
