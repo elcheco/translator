@@ -1,4 +1,5 @@
 # ElCheco Translator
+[![Downloads this Month](https://img.shields.io/packagist/dm/elcheco/translator.svg)](https://packagist.org/packages/elcheco/translator) [![License](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://github.com/elcheco/translator/blob/master/LICENSE)
 
 A powerful and flexible translation library for PHP applications with support for both NEON files and database storage.
 
