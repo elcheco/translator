@@ -121,3 +121,25 @@ $connection = new \Dibi\Connection([
 
 exampleWithDatabaseDictionary($connection);
 */
+
+use ElCheco\Translator\PluralRulesInterface;
+use ElCheco\Translator\Translation;
+
+class MyPluralRules implements PluralRulesInterface
+{
+    public static function getNormalizedCount(string $locale, int $count): int
+    {
+        // Your custom rules here
+        // For example, special rules for a specific dialect
+        if ($locale === 'fr_CA') {
+            // French Canadian specific rules
+            return $count === 1 ? 1 : 2;
+        }
+
+        // For other locales, fall back to default rules
+        return \ElCheco\Translator\PluralRules::getNormalizedCount($locale, $count);
+    }
+}
+
+// Register your custom rules
+Translation::setCustomPluralRules(new MyPluralRules());

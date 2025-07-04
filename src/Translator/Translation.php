@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 namespace ElCheco\Translator;
 
-readonly class Translation
+class Translation
 {
     private int $max;
+    private static ?PluralRulesInterface $customPluralRules = null;
 
     /**
      * @param array<int|string, string> $translation
@@ -21,6 +22,14 @@ readonly class Translation
         private string $locale = 'en'
     ) {
         $this->max = max(array_keys($translation));
+    }
+
+    /**
+     * Set a custom plural rules implementation
+     */
+    public static function setCustomPluralRules(PluralRulesInterface $rules): void
+    {
+        self::$customPluralRules = $rules;
     }
 
     /**
@@ -36,7 +45,12 @@ readonly class Translation
             return str_replace('%count%', '%s', $this->translation[$this->max] ?? '');
         }
 
-        $normalizedCount = PluralRules::getNormalizedCount($this->locale, $count);
+        // Use custom plural rules if set, otherwise use default
+        if (self::$customPluralRules !== null) {
+            $normalizedCount = self::$customPluralRules->getNormalizedCount($this->locale, $count);
+        } else {
+            $normalizedCount = PluralRules::getNormalizedCount($this->locale, $count);
+        }
 
         $translationKey = isset($this->translation[$normalizedCount]) ? $normalizedCount : $this->max;
 

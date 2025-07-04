@@ -228,15 +228,18 @@ vendor/bin/tester tests/
 use ElCheco\Translator\NeonDictionary\NeonDictionaryFactory;
 use ElCheco\Translator\Translator;
 
+// Create dictionary factory
 $factory = new NeonDictionaryFactory(
     __DIR__ . '/translations',  // Directory with translation files
     __DIR__ . '/temp/cache',    // Cache directory
     true                        // Auto refresh
 );
 
-$translator = new Translator($factory);
-$translator->setLocale('fr_FR');      // Primary locale
-$translator->setFallbackLocale('en_US'); // Fallback locale
+// Create dictionary
+$dictionary = $factory->create('fr_FR', 'en_US');  // locale, fallbackLocale
+
+// Create translator
+$translator = new Translator($dictionary);
 ```
 
 ### DB Dictionary With Usage Tracking
@@ -245,50 +248,50 @@ $translator->setFallbackLocale('en_US'); // Fallback locale
 use ElCheco\Translator\DbDictionary\DbDictionaryFactory;
 use ElCheco\Translator\Translator;
 
+// Create dictionary factory
 $factory = new DbDictionaryFactory(
     $connection,  // Dibi or other DB connection
     'Frontend',   // Module name
     true          // Track usage
 );
 
-$translator = new Translator($factory);
-$translator->setLocale('de_DE');
+// Create dictionary
+$dictionary = $factory->create('de_DE', 'en_US');  // locale, fallbackLocale
+
+// Create translator
+$translator = new Translator($dictionary);
+
+// When application shuts down, save usage statistics
+$dictionary->saveUsageStats();
 ```
 
 ## Advanced Usage
 
 ### Customizing Plural Rules
 
-ElCheco Translator includes built-in plural rules for many languages. If you need to add custom rules, you can extend the `PluralRules` class:
+ElCheco Translator includes built-in plural rules for many languages. If you need to add custom rules for specific languages or dialects, you can implement the `PluralRulesInterface`:
 
 ```php
-use ElCheco\Translator\PluralRules;
+use ElCheco\Translator\PluralRulesInterface;
+use ElCheco\Translator\Translation;
 
-class MyPluralRules extends PluralRules
+class MyPluralRules implements PluralRulesInterface
 {
-    // Add custom language rules
-}
-```
-
-### Creating Custom Dictionary Implementations
-
-You can create your own dictionary implementation by implementing the `DictionaryInterface`:
-
-```php
-use ElCheco\Translator\DictionaryInterface;
-
-class MyCustomDictionary implements DictionaryInterface
-{
-    public function get(string $message): string|array
+    public static function getNormalizedCount(string $locale, int $count): int
     {
-        // Your implementation
-    }
-    
-    public function has(string $message): bool
-    {
-        // Your implementation
+        // Your custom rules here
+        if ($locale === 'custom_locale') {
+            // Custom logic for your locale
+            return $count === 1 ? 1 : 2;
+        }
+        
+        // For other locales, fall back to default rules
+        return \ElCheco\Translator\PluralRules::getNormalizedCount($locale, $count);
     }
 }
+
+// Register your custom rules
+Translation::setCustomPluralRules(new MyPluralRules());
 ```
 
 Note:

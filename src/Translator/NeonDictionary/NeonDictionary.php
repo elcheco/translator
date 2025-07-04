@@ -14,24 +14,12 @@ use ElCheco\Translator\Dictionary;
 
 final class NeonDictionary extends Dictionary
 {
-	/**
-	 * @var string
-	 */
-	private $filename;
 
-	/**
-	 * @var string
-	 */
-	private $cacheFilename;
-
-    /**
-     * @var string
-     */
-    private $fallbackFilename;
-
-
-	public function __construct(string $filename, string $cacheFilename, ?string $fallbackFilename = null)
-	{
+	public function __construct(
+        private string $filename,
+        private string $cacheFilename,
+        private ?string $fallbackFilename = null
+    ) {
 		if (!\is_file($filename)) {
 			throw NeonDictionaryException::fileNotFound($filename);
 		}
@@ -39,12 +27,7 @@ final class NeonDictionary extends Dictionary
         if ($fallbackFilename && !\is_file($fallbackFilename)) {
             throw NeonDictionaryException::fileNotFound($fallbackFilename);
         }
-
-		$this->filename = $filename;
-		$this->cacheFilename = $cacheFilename;
-        $this->fallbackFilename = $fallbackFilename;
 	}
-
 
 	protected function lazyLoad(): void
 	{

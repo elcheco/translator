@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace ElCheco\Translator;
 
-readonly class PluralRules
+class PluralRules implements PluralRulesInterface
 {
     /**
      * Languages with tens repetition pattern
@@ -103,12 +103,12 @@ readonly class PluralRules
         if ($mod10 === 1) {
             return 1;
         }
-        
+
         // For 2-4, 22-24, 32-34, etc. use the dual form
         if ($mod10 >= 2 && $mod10 <= 4) {
             return 2;
         }
-        
+
         // For everything else, use the plural form
         return 5;
     }

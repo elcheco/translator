@@ -14,40 +14,19 @@ use ElCheco\Translator\DictionaryInterface;
 
 final class NeonDictionaryFactory implements DictionaryFactoryInterface
 {
-    /**
-     * @var string
-     */
-    private $directory;
-
-    /**
-     * @var string
-     */
-    private $cacheDir;
-
-    /**
-     * @var bool
-     */
-    private $autoRefreshEnabled;
-
-
     public function __construct(
-        string $directory,
-        string $cacheDir,
-        bool $autoRefreshEnabled = true,
+        private string $directory,
+        private string $cacheDir,
+        private bool $autoRefreshEnabled = true,
         int $cacheDirMode = 0775
     ) {
         if (!\is_dir($directory)) {
             throw NeonDictionaryException::translationDirNotFound($directory);
         }
 
-        $this->directory = $directory;
-
         if (!\is_dir($cacheDir) && @!\mkdir($cacheDir, $cacheDirMode, true) || !\is_writable($cacheDir)) {
             throw NeonDictionaryException::cacheDirIsNotWritable($cacheDir);
         }
-
-        $this->cacheDir = $cacheDir;
-        $this->autoRefreshEnabled = $autoRefreshEnabled;
     }
 
     /**

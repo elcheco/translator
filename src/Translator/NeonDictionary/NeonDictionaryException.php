@@ -15,21 +15,20 @@ use ElCheco\Translator\TranslatorException;
 final class NeonDictionaryException extends TranslatorException
 {
 
-	public static function cacheDirIsNotWritable(string $cacheDir)
+	public static function cacheDirIsNotWritable(string $cacheDir): self
 	{
 		return new static(sprintf("Cache directory %s is not writable.", $cacheDir));
 	}
 
 
-	public static function fileNotFound(string $filename)
+	public static function fileNotFound(string $filename): self
 	{
 		return new static(sprintf("Translation file %s not found.", $filename));
 	}
 
 
-	public static function translationDirNotFound(string $dir)
+	public static function translationDirNotFound(string $dir): self
 	{
 		return new static(sprintf("Translation directory %s not found.", $dir));
 	}
-
 }
