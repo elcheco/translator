@@ -1,4 +1,6 @@
-testsold/temp
+testsold/
 vendor
 composer.lock
 .idea/
+.phpunit.cache
+build/
