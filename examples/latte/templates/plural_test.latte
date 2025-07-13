@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Translator Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        h2 { color: #666; margin-top: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 5px 0; padding: 5px; background-color: #f5f5f5; border-radius: 3px; }
+        .highlight { background-color: #ffe; }
+    </style>
+</head>
+<body>
+    <h1>{_'Welcome'}</h1>
+    <p>{_'Hello %s', $name}</p>
+
+    <h2>Room Count Test</h2>
+    <ul>
+        <li>0: {_'room_count', 0}</li>
+        <li>1: {_'room_count', 1}</li>
+        <li>2: {_'room_count', 2}</li>
+        <li>3: {_'room_count', 3}</li>
+        <li>4: {_'room_count', 4}</li>
+        <li>5: {_'room_count', 5}</li>
+        <li>1.5: {_'room_count', 1.5}</li>
+    </ul>
+
+    <h2>Days Count Test</h2>
+    <ul>
+        <li>0: {_'days_count', 0}</li>
+        <li>1: {_'days_count', 1}</li>
+        <li>2: {_'days_count', 2}</li>
+        <li>5: {_'days_count', 5}</li>
+    </ul>
+
+    <h2>Dynamic Count Test</h2>
+    <ul>
+        <li class="highlight">Current count ({$count}): {_'room_count', $count}</li>
+    </ul>
+</body>
+</html>

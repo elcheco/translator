@@ -1,0 +1,15 @@
+Welcome: "Vítejte na našem webu"
+"Hello %s": "Ahoj %s"
+
+# CLDR format for plurals
+room_count:
+    one: "{count} pokoj"
+    few: "{count} pokoje"
+    many: "{count, number} pokoje"
+    other: "{count} pokojů"
+
+days_count:
+    one: "{count} den"
+    few: "{count} dny"
+    many: "{count, number} dne"
+    other: "{count} dní"

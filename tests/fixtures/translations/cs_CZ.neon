@@ -14,3 +14,15 @@ days_count:
     few: "{count} dny"
     many: "{count, number} dne"
     other: "{count} dní"
+
+room_count:
+    one: "{count} pokoj"
+    few: "{count} pokoje"
+    many: "{count, number} pokoje"
+    other: "{count} pokojů"
+
+room_count_simple:
+    one: "pokoj"
+    few: "pokoje"
+    many: "pokoje"
+    other: "pokojů"

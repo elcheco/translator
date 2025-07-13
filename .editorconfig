@@ -1,0 +1,7 @@
+# Default (applies to all files)
+[*]
+insert_final_newline = true
+
+# Only for Latte files
+[*.latte]
+insert_final_newline = false

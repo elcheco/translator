@@ -9,6 +9,9 @@ use ElCheco\Translator\Translation;
 use ElCheco\Translator\DictionaryInterface;
 use ElCheco\Translator\TranslatorException;
 use MessageFormatter;
+use function apc_bin_dump;
+use function bdump;
+use function method_exists;
 
 /**
  * Enhanced Translator with CLDR support
@@ -70,7 +73,7 @@ class CldrTranslator extends Translator
             return $this->warn('Message must be string, but %s given.', \gettype($message));
         }
 
-        // Create dictionary on first access
+        // Create a dictionary on first access
         if ($this->getDictionary() === null) {
             $dictionaryFactory = $this->getDictionaryFactory();
             $dictionary = $dictionaryFactory->create($this->getLocale(), $this->getFallbackLocale());
@@ -85,7 +88,7 @@ class CldrTranslator extends Translator
 
             // Check if this is a CLDR-aware dictionary
             $metadata = null;
-            if ($dictionary instanceof CldrNeonDictionary) {
+            if (method_exists($dictionary, 'getFormatMetadata')) {
                 $metadata = $dictionary->getFormatMetadata($message);
             }
 
@@ -111,6 +114,12 @@ class CldrTranslator extends Translator
         // Apply string formatting if we have parameters and it's not already handled by ICU
         if (!empty($parameters) && !$this->isIcuFormatted($result)) {
             $result = $this->applySprintfFormatting($result, $parameters);
+        }
+
+        // Replace {count} placeholders with actual count value for Latte compatibility
+        if (!empty($parameters) && strpos($result, '{count}') !== false) {
+            $count = $parameters[0] ?? 0;
+            $result = str_replace('{count}', (string)$count, $result);
         }
 
         return $result;
@@ -142,6 +151,26 @@ class CldrTranslator extends Translator
 
         // Fall back to legacy translation handling
         if ($count !== null && is_numeric($count)) {
+            if ($isCldr && $this->isCldrEnabled()) {
+                // For CLDR format, directly use the plural category
+                $category = CldrPluralRules::getPluralCategory($this->getLocale(), (float)$count);
+
+                // If the category exists in the translation, use it
+                if (isset($translation[$category])) {
+                    $result = $translation[$category];
+                    // Replace {count} with the actual count
+                    return str_replace('{count}', (string)$count, $result);
+                }
+
+                // Fallback to 'other' category
+                if (isset($translation['other'])) {
+                    $result = $translation['other'];
+                    // Replace {count} with the actual count
+                    return str_replace('{count}', (string)$count, $result);
+                }
+            }
+
+            // Use regular Translation for legacy format
             $t = new Translation($translation, $this->getLocale());
             return $t->get((int) $count);
         } elseif ($count === null) {
@@ -244,7 +273,7 @@ class CldrTranslator extends Translator
         // Simple check for ICU message format patterns
         return strpos($text, '{count, plural,') !== false
             || strpos($text, '{count, select,') !== false
-            || preg_match('/\{[a-zA-Z_]\w*\}/', $text) === 1;
+            || preg_match('/\{[a-zA-Z_]\w*\}/', $text) >= 1;
     }
 
     /**

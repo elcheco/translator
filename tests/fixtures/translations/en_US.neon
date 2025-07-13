@@ -21,3 +21,11 @@ items_count:
 user_messages:
     one: "%2$s has %1$s message"
     other: "%2$s has %1$s messages"
+
+room_count:
+    one: "{count} room"
+    other: "{count} rooms"
+
+room_count_simple:
+    one: "room"
+    other: "rooms"

@@ -21,12 +21,9 @@ class TranslatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->translationsDir = __DIR__ . '/fixtures/translations';
+        $this->translationsDir = __DIR__ . '/../fixtures/translations';
         $this->cacheDir = sys_get_temp_dir() . '/translator_tests_' . uniqid();
         mkdir($this->cacheDir, 0777, true);
-
-        // Create test translation files
-        $this->createTestTranslationFiles();
     }
 
     protected function tearDown(): void
@@ -363,6 +360,62 @@ class TranslatorTest extends TestCase
         $this->assertEquals('empty_translation', $translator->translate('empty_translation'));
     }
 
+    /**
+     * Test room_count plurals in all languages
+     */
+    public function testRoomCountPlurals(): void
+    {
+        // Test English plurals
+        $enTranslator = $this->createTranslator('en_US');
+        $this->assertEquals('{count} rooms', $enTranslator->translate('room_count', 1));
+        $this->assertEquals('{count} rooms', $enTranslator->translate('room_count', 2));
+        $this->assertEquals('{count} rooms', $enTranslator->translate('room_count', 5));
+
+        // Test German plurals
+        $deTranslator = $this->createTranslator('de_DE');
+        $this->assertEquals('{count} Zimmer', $deTranslator->translate('room_count', 1));
+        $this->assertEquals('{count} Zimmer', $deTranslator->translate('room_count', 2));
+        $this->assertEquals('{count} Zimmer', $deTranslator->translate('room_count', 5));
+
+        // Test Czech plurals with regular translator
+        $csTranslator = $this->createTranslator('cs_CZ');
+
+        // With regular translator and CLDR format, it should fall back to 'other' form
+        $this->assertEquals('{count} pokojů', $csTranslator->translate('room_count', 1));
+        $this->assertEquals('{count} pokojů', $csTranslator->translate('room_count', 2));
+        $this->assertEquals('{count} pokojů', $csTranslator->translate('room_count', 5));
+    }
+
+    /**
+     * Test Czech room_count plurals with CLDR translator
+     */
+    public function testCzechRoomCountCldrPlurals(): void
+    {
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('The Intl extension is not available.');
+        }
+
+        // Test Czech plurals with CLDR translator
+        $csCldrTranslator = $this->createCldrTranslator('cs_CZ');
+
+        // Test one (1)
+        $this->assertEquals('1 pokoj', $csCldrTranslator->translate('room_count', 1));
+
+        // Test few (2-4) - this is where the issue might be
+        $this->assertEquals('2 pokoje', $csCldrTranslator->translate('room_count', 2));
+        $this->assertEquals('3 pokoje', $csCldrTranslator->translate('room_count', 3));
+        $this->assertEquals('4 pokoje', $csCldrTranslator->translate('room_count', 4));
+
+        // Test other (0, 5+)
+        $this->assertEquals('0 pokojů', $csCldrTranslator->translate('room_count', 0));
+        $this->assertEquals('5 pokojů', $csCldrTranslator->translate('room_count', 5));
+        $this->assertEquals('10 pokojů', $csCldrTranslator->translate('room_count', 10));
+
+        // Test many (decimals)
+        $this->assertEquals('1,5 pokoje', $csCldrTranslator->translate('room_count', 1.5));
+        $this->assertEquals('2,5 pokoje', $csCldrTranslator->translate('room_count', 2.5));
+    }
+
     // Helper methods
 
     private function createTranslator(string $locale, ?string $fallbackLocale = null): Translator
@@ -378,77 +431,32 @@ class TranslatorTest extends TestCase
 
     private function createCldrTranslator(string $locale, ?string $fallbackLocale = null): CldrTranslator
     {
-        $factory = new NeonDictionaryFactory($this->translationsDir, $this->cacheDir);
+        // Create a custom factory that creates CldrNeonDictionary instances
+        $factory = new class($this->translationsDir, $this->cacheDir) implements \ElCheco\Translator\DictionaryFactoryInterface {
+            private string $directory;
+            private string $cacheDir;
+
+            public function __construct(string $directory, string $cacheDir) {
+                $this->directory = $directory;
+                $this->cacheDir = $cacheDir;
+            }
+
+            public function create(string $locale, ?string $fallbackLocale = null): \ElCheco\Translator\DictionaryInterface {
+                $sourceFile = "{$this->directory}/{$locale}.neon";
+                $cacheFile = "{$this->cacheDir}/{$locale}.php";
+
+                $fallbackSourceFile = $fallbackLocale ? "{$this->directory}/{$fallbackLocale}.neon" : null;
+
+                return new \ElCheco\Translator\Cldr\CldrNeonDictionary($sourceFile, $cacheFile, $fallbackSourceFile);
+            }
+        };
+
         $translator = new CldrTranslator($factory);
         $translator->setLocale($locale);
         if ($fallbackLocale) {
             $translator->setFallbackLocale($fallbackLocale);
         }
         return $translator;
-    }
-
-    private function createTestTranslationFiles(): void
-    {
-        // English translations
-        $enTranslations = <<<'NEON'
-Welcome: "Welcome to our website"
-"Hello %s": "Hello %s"
-"Hello %s %s": "Hello %s %s"
-special_placeholders: "Label: %label, Name: %name, Value: %value"
-empty_translation: ""
-fallback_only: "Fallback message"
-
-# Legacy plural format - works with regular translator
-messages_count_legacy:
-    0: "You have %s messages"
-    1: "You have %s message"
-    2: "You have %s messages"
-
-# CLDR format - for now, regular translator will use 'other' form
-items_count:
-    zero: "You have no items"
-    one: "You have one item"
-    other: "You have {count} items"
-
-# Mixed parameters - regular translator uses highest form
-user_messages:
-    one: "%2$s has %1$s message"
-    other: "%2$s has %1$s messages"
-NEON;
-
-        // Czech translations
-        $csTranslations = <<<'NEON'
-Welcome: "Vítejte na našem webu"
-"Hello %s": "Ahoj %s"
-
-# Legacy format with ranges - works with regular translator
-messages_count_legacy:
-    0: "%s zpráv"
-    1: "%s zpráva"
-    "2-4": "%s zprávy"
-    5: "%s zpráv"
-
-# CLDR format - regular translator will use 'other' form
-days_count:
-    one: "{count} den"
-    few: "{count} dny"
-    many: "{count, number} dne"
-    other: "{count} dní"
-NEON;
-
-        // German translations (partial)
-        $deTranslations = <<<'NEON'
-Welcome: "Willkommen"
-NEON;
-
-        // Create translation files
-        if (!is_dir($this->translationsDir)) {
-            mkdir($this->translationsDir, 0777, true);
-        }
-
-        file_put_contents($this->translationsDir . '/en_US.neon', $enTranslations);
-        file_put_contents($this->translationsDir . '/cs_CZ.neon', $csTranslations);
-        file_put_contents($this->translationsDir . '/de_DE.neon', $deTranslations);
     }
 
     private function removeDirectory(string $dir): void

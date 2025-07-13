@@ -1,1 +1,9 @@
 Welcome: "Willkommen"
+
+room_count:
+    one: "{count} Zimmer"
+    other: "{count} Zimmer"
+
+room_count_simple:
+    one: "Zimmer"
+    other: "Zimmer"

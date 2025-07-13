@@ -1,0 +1,63 @@
+{block content}
+<h1>CLDR Plural Forms Test</h1>
+
+<h2>Testing room_count with different values</h2>
+
+<div class="test-section">
+    <h3>Testing with specific value: {$specificCount}</h3>
+    <p>Result: {_'room_count', $specificCount}</p>
+    <p>Expected for value 2: "2 pokoje" (Czech "few" form for 2-4)</p>
+</div>
+
+<div class="test-section">
+    <h3>Testing with all count values</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Count</th>
+                <th>Result</th>
+                <th>Expected Form</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $counts as $count}
+                <tr>
+                    <td>{$count}</td>
+                    <td>{_'room_count', $count}</td>
+                    <td>
+                        {if $count == 1}
+                            one: "X pokoj"
+                        {elseif $count >= 2 && $count <= 4 && (int)$count == $count}
+                            few: "X pokoje"
+                        {elseif is_float($count)}
+                            many: "X pokoje"
+                        {else}
+                            other: "X pokojů"
+                        {/if}
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+</div>
+
+<h2>How to verify</h2>
+<p>
+    The "Result" column should match the "Expected Form" column for each count value:
+</p>
+<ul>
+    <li>For count = 1: should show "1 pokoj" (one form)</li>
+    <li>For count = 2, 3, 4: should show "X pokoje" (few form)</li>
+    <li>For decimal numbers (1.5, 2.5): should show "X,Y pokoje" (many form)</li>
+    <li>For count = 0, 5, and higher: should show "X pokojů" (other form)</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<p>If you're seeing incorrect plural forms:</p>
+<ol>
+    <li>Make sure you're using <code>CldrTranslator</code> and <code>CldrDbDictionaryFactory</code> in your configuration</li>
+    <li>Verify that your database contains the correct CLDR plural forms for Czech</li>
+    <li>Check that the PHP intl extension is installed and enabled</li>
+    <li>Enable debug mode in your config to see more detailed error messages</li>
+</ol>
+{/block}
