@@ -11,7 +11,7 @@ namespace ElCheco\Translator;
 
 class Translation
 {
-    private int $max;
+    private int|string $max;
     private static ?PluralRulesInterface $customPluralRules = null;
 
     /**
@@ -21,7 +21,17 @@ class Translation
         private array $translation,
         private string $locale = 'en'
     ) {
-        $this->max = max(array_keys($translation));
+        $keys = array_keys($translation);
+
+        // Filter numeric keys and find the maximum
+        $numericKeys = array_filter($keys, 'is_numeric');
+
+        if (!empty($numericKeys)) {
+            $this->max = max(array_map('intval', $numericKeys));
+        } else {
+            // If no numeric keys, use the last key
+            $this->max = end($keys);
+        }
     }
 
     /**
@@ -42,7 +52,9 @@ class Translation
     {
         if ($count === null) {
             // For null count, use the highest form but leave the %s placeholder intact
-            return str_replace('%count%', '%s', $this->translation[$this->max] ?? '');
+            $maxKey = is_int($this->max) ? $this->max : array_key_last($this->translation);
+            $text = $this->translation[$maxKey] ?? '';
+            return str_replace('%count%', '%s', $text);
         }
 
         // Use custom plural rules if set, otherwise use default
@@ -56,6 +68,6 @@ class Translation
 
         // Note: We don't replace %s with the count here anymore
         // This will be handled by the Translator class using vsprintf
-        return $this->translation[$translationKey];
+        return $this->translation[$translationKey] ?? '';
     }
 }

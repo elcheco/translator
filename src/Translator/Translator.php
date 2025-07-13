@@ -12,7 +12,7 @@ namespace ElCheco\Translator;
 use NumberFormatter;
 use Psr\Log\LoggerInterface;
 
-final class Translator implements TranslatorInterface
+class Translator implements TranslatorInterface
 {
     /**
      * indicates debug mode
@@ -214,7 +214,7 @@ final class Translator implements TranslatorInterface
     }
 
 
-    private function formatNumber($number, int $decimals = 0): string
+    protected function formatNumber($number, int $decimals = 0): string
     {
         $formatter = new NumberFormatter($this->locale, NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $decimals);
@@ -224,7 +224,7 @@ final class Translator implements TranslatorInterface
     }
 
 
-    private function warn($message): string
+    protected function warn($message): string
     {
         // format message
         $args = \func_get_args();

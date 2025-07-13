@@ -1,0 +1,23 @@
+Welcome: "Welcome to our website"
+"Hello %s": "Hello %s"
+"Hello %s %s": "Hello %s %s"
+special_placeholders: "Label: %label, Name: %name, Value: %value"
+empty_translation: ""
+fallback_only: "Fallback message"
+
+# Legacy plural format - works with regular translator
+messages_count_legacy:
+    0: "You have %s messages"
+    1: "You have %s message"
+    2: "You have %s messages"
+
+# CLDR format - for now, regular translator will use 'other' form
+items_count:
+    zero: "You have no items"
+    one: "You have one item"
+    other: "You have {count} items"
+
+# Mixed parameters - regular translator uses highest form
+user_messages:
+    one: "%2$s has %1$s message"
+    other: "%2$s has %1$s messages"

@@ -12,7 +12,7 @@ namespace ElCheco\Translator\NeonDictionary;
 use Nette\Neon\Neon;
 use ElCheco\Translator\Dictionary;
 
-final class NeonDictionary extends Dictionary
+class NeonDictionary extends Dictionary
 {
 
 	public function __construct(

@@ -149,6 +149,11 @@ class ExportNeonTranslationsCommand extends Console\Command\Command
         foreach ($rows as $row) {
             $key = $row['key'];
 
+            // Skip if this key should not be included
+            if (!empty($includeKeys) && !in_array($key, $includeKeys)) {
+                continue;
+            }
+
             // Handle different translation types
             if ($row['type'] === 'plural' && $row['plural_values']) {
                 // Plural values are stored as JSON, decode them

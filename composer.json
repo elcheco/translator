@@ -20,19 +20,29 @@
     "nette/neon": "^3.0",
     "nette/safe-stream": "^2.4|^3.0",
     "nette/utils": "^3.0|^4.0",
-    "psr/log": "^1.0",
+    "psr/log": "^3.0",
     "symfony/console": "^7.2"
   },
   "require-dev": {
-    "nette/tester": "^2.0",
     "mockery/mockery": "^1.5",
-    "phpstan/phpstan": "^1.10"
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^12.2"
   },
   "autoload": {
     "psr-4": {
       "ElCheco\\": [
         "src"
-      ]
+      ],
+      "ElCheco\\Translator\\Tests\\": "tests/"
     }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "test:unit": "phpunit --testsuite 'Unit Tests'",
+    "test:integration": "phpunit --testsuite 'Integration Tests'",
+    "test:cldr": "phpunit --testsuite 'CLDR Tests'",
+    "test:console": "phpunit --testsuite 'Console Tests'",
+    "test:coverage": "phpunit --coverage-html build/coverage",
+    "test:demo": "php tests/run-tests.php"
   }
 }

@@ -1,59 +1,62 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Rostenkowski\Translate;
+declare(strict_types=1);
 
+/**
+ * Bootstrap file for ElCheco Translator tests
+ */
 
-use Mockery;
-use Tester\Environment;
-use const TEMP_DIR;
-use function lcg_value;
+// Composer autoloader
+$autoloadFiles = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+];
 
-$dir = dirname(__DIR__);
-
-require "$dir/vendor/autoload.php";
-
-// Add in bootstrap.php or at the beginning of your test
-if (!class_exists('PhpToken')) {
-    class PhpToken {
-        public $id;
-        public $text;
-        public $line;
-        public $pos;
-
-        public function __construct($id, $text, $line = -1, $pos = -1) {
-            $this->id = $id;
-            $this->text = $text;
-            $this->line = $line;
-            $this->pos = $pos;
-        }
-
-        public static function tokenize($code, $flags = 0) {
-            $tokens = token_get_all($code, $flags);
-            $result = [];
-
-            foreach ($tokens as $token) {
-                if (is_array($token)) {
-                    $result[] = new self($token[0], $token[1], $token[2] ?? -1, -1);
-                } else {
-                    $result[] = new self(ord($token), $token, -1, -1);
-                }
-            }
-
-            return $result;
-        }
+$autoloadFound = false;
+foreach ($autoloadFiles as $autoloadFile) {
+    if (file_exists($autoloadFile)) {
+        require_once $autoloadFile;
+        $autoloadFound = true;
+        break;
     }
 }
 
-// With this:
-if (class_exists('\\Random\\Randomizer')) {
-    $randomizer = new \Random\Randomizer();
-    define('TEMP_DIR', __DIR__ . '/temp/' . (string) $randomizer->getFloat(0, 1));
-} else {
-    define('TEMP_DIR', __DIR__ . '/temp/' . (string) lcg_value());
+if (!$autoloadFound) {
+    die('Composer autoloader not found. Please run "composer install".' . PHP_EOL);
 }
 
-@mkdir(TEMP_DIR, 0775, true);
+// Set error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
 
-Environment::setup();
+// Set timezone
+date_default_timezone_set('UTC');
 
-Mockery::globalHelpers();
+// Create temp directory for tests
+$tempDir = sys_get_temp_dir() . '/elcheco_translator_tests';
+if (!is_dir($tempDir)) {
+    mkdir($tempDir, 0777, true);
+}
+
+// Register test cleanup
+register_shutdown_function(function() use ($tempDir) {
+    if (is_dir($tempDir)) {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($tempDir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileinfo) {
+            $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            @$todo($fileinfo->getRealPath());
+        }
+
+        @rmdir($tempDir);
+    }
+});
+
+// Set up Mockery if available
+if (class_exists('Mockery')) {
+    Mockery::globalHelpers();
+}

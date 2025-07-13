@@ -1,0 +1,16 @@
+Welcome: "Vítejte na našem webu"
+"Hello %s": "Ahoj %s"
+
+# Legacy format with ranges - works with regular translator
+messages_count_legacy:
+    0: "%s zpráv"
+    1: "%s zpráva"
+    "2-4": "%s zprávy"
+    5: "%s zpráv"
+
+# CLDR format - regular translator will use 'other' form
+days_count:
+    one: "{count} den"
+    few: "{count} dny"
+    many: "{count, number} dne"
+    other: "{count} dní"
