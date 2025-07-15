@@ -25,17 +25,97 @@ class CldrDbDictionaryTest extends TestCase
             $this->markTestSkipped('The Intl extension is not available.');
         }
 
+        // Skip if sqlite3 extension is not available
+        if (!extension_loaded('sqlite3')) {
+            $this->markTestSkipped('The SQLite3 extension is not available.');
+        }
+
         // Create in-memory SQLite database for testing
         $this->connection = new Connection([
             'driver' => 'sqlite3',
             'database' => ':memory:',
         ]);
 
-        // Set up database schema
+        // Set up a database schema
         $this->setupDatabase();
 
         // Insert test data
         $this->insertTestData();
+    }
+
+    /**
+     * Test that usage tracking works correctly when enabled
+     */
+    public function testUsageTracking(): void
+    {
+        // Create CldrDbDictionaryFactory with tracking enabled
+        $factory = new CldrDbDictionaryFactory($this->connection, 'TestModule', true);
+
+        // Create CldrTranslator
+        $translator = new CldrTranslator($factory);
+        $translator->setLocale('cs_CZ');
+
+        // Get the initial usage count
+        $initialCount = $this->getUsageCount('room_count');
+        $this->assertEquals(0, $initialCount, 'Initial usage count should be 0');
+
+        // Use the translation multiple times
+        $translator->translate('room_count', 1);
+        $translator->translate('room_count', 2);
+        $translator->translate('room_count', 3);
+
+        // Get the dictionary to force it to be created
+        $reflection = new \ReflectionClass($translator);
+        $getDictionaryMethod = $reflection->getMethod('getDictionary');
+        $getDictionaryMethod->setAccessible(true);
+        $dictionary = $getDictionaryMethod->invoke($translator);
+
+        // Get the underlying DbDictionary
+        $reflection = new \ReflectionClass($dictionary);
+        $dbDictionaryProperty = $reflection->getProperty('dbDictionary');
+        $dbDictionaryProperty->setAccessible(true);
+        $dbDictionary = $dbDictionaryProperty->getValue($dictionary);
+
+        // Explicitly unset the dictionary to trigger the destructor
+        // This simulates what happens when the application shuts down
+        unset($dbDictionary);
+        unset($dictionary);
+        unset($translator);
+
+        // Force garbage collection to ensure destructor is called
+        gc_collect_cycles();
+
+        // Check that usage count has been updated automatically via the destructor
+        $newCount = $this->getUsageCount('room_count');
+        $this->assertEquals(3, $newCount, 'Usage count should be automatically updated to 3 via destructor');
+    }
+
+    /**
+     * Test that usage tracking is disabled when configured
+     */
+    public function testUsageTrackingDisabled(): void
+    {
+        // Create CldrDbDictionaryFactory with tracking disabled
+        $factory = new CldrDbDictionaryFactory($this->connection, 'TestModule', false);
+
+        // Create CldrTranslator
+        $translator = new CldrTranslator($factory);
+        $translator->setLocale('cs_CZ');
+
+        // Get the initial usage count
+        $initialCount = $this->getUsageCount('room_count');
+
+        // Use the translation multiple times
+        $translator->translate('room_count', 1);
+        $translator->translate('room_count', 2);
+
+        // Explicitly unset the dictionary to trigger the destructor
+        unset($translator);
+        gc_collect_cycles();
+
+        // Check that usage count has not been updated
+        $newCount = $this->getUsageCount('room_count');
+        $this->assertEquals($initialCount, $newCount, 'Usage count should not be updated when tracking is disabled');
     }
 
     /**
@@ -139,5 +219,22 @@ class CldrDbDictionaryTest extends TestCase
             INSERT INTO [translations] ([key_id], [locale], [value], [plural_values])
             VALUES (%i, %s, %s, %s)
         ', $keyId, 'cs_CZ', null, $pluralValues);
+    }
+
+    /**
+     * Get the usage count for a translation key
+     *
+     * @param string $key
+     * @return int
+     */
+    private function getUsageCount(string $key): int
+    {
+        $result = $this->connection->query('
+            SELECT [usage_count]
+            FROM [translation_keys]
+            WHERE [key] = %s
+        ', $key)->fetch();
+
+        return $result ? (int) $result['usage_count'] : 0;
     }
 }

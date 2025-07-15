@@ -24,6 +24,11 @@ class ConsoleCommandsTest extends TestCase
     {
         parent::setUp();
 
+        // Skip if sqlite3 extension is not available
+        if (!extension_loaded('sqlite3')) {
+            $this->markTestSkipped('The SQLite3 extension is not available.');
+        }
+
         // Create test directories
         $this->translationsDir = sys_get_temp_dir() . '/translator_import_' . uniqid();
         $this->outputDir = sys_get_temp_dir() . '/translator_export_' . uniqid();
@@ -33,7 +38,7 @@ class ConsoleCommandsTest extends TestCase
         // Create test database
         $this->testDbFile = sys_get_temp_dir() . '/translator_cmd_test_' . uniqid() . '.db';
         $this->connection = new Connection([
-            'driver' => 'sqlite',
+            'driver' => 'sqlite3',
             'database' => $this->testDbFile,
         ]);
 

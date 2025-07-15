@@ -19,10 +19,15 @@ class DbDictionaryTest extends TestCase
     {
         parent::setUp();
 
+        // Skip if sqlite3 extension is not available
+        if (!extension_loaded('sqlite3')) {
+            $this->markTestSkipped('The SQLite3 extension is not available.');
+        }
+
         // Create test SQLite database
         $this->testDbFile = sys_get_temp_dir() . '/translator_test_' . uniqid() . '.db';
         $this->connection = new Connection([
-            'driver' => 'sqlite',
+            'driver' => 'sqlite3',
             'database' => $this->testDbFile,
         ]);
 
@@ -168,23 +173,18 @@ class DbDictionaryTest extends TestCase
         // Track some usage
         $dictionary->get('welcome');
 
-        // Create a new connection that we can break
-        $brokenConnection = new Connection([
-            'driver' => 'sqlite',
-            'database' => ':memory:', // This will be different from the main connection
-        ]);
+        // Create a trigger that will cause an error during UPDATE
+        $this->connection->query("
+            CREATE TRIGGER fail_update
+            BEFORE UPDATE ON translation_keys
+            BEGIN
+                SELECT RAISE(FAIL, 'Simulated database error');
+            END
+        ");
 
-        // Close the broken connection to simulate database error
-        $brokenConnection->disconnect();
-
-        // Use reflection to inject the broken connection
-        $reflection = new \ReflectionClass($dictionary);
-        $property = $reflection->getProperty('connection');
-        $property->setAccessible(true);
-        $property->setValue($dictionary, $brokenConnection);
-
-        // Should handle the error gracefully
-        $this->expectException(\Exception::class);
+        // Should throw an exception when trying to update
+        $this->expectException(\Dibi\DriverException::class);
+        $this->expectExceptionMessage('Simulated database error');
         $dictionary->saveUsageStats();
     }
 
