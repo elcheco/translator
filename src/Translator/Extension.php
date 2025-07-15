@@ -11,6 +11,7 @@ use Nette\Schema\Schema;
 use ElCheco\Translator\NeonDictionary\NeonDictionaryFactory;
 use ElCheco\Translator\DbDictionary\DbDictionaryFactory;
 use ElCheco\Translator\DbDictionary\DbDictionary;
+use ElCheco\Translator\Cldr\CldrDbDictionaryFactory;
 use ElCheco\Translator\ShutdownHandler;
 
 class Extension extends CompilerExtension
@@ -109,8 +110,8 @@ class Extension extends CompilerExtension
             ->addSetup('setLocale', [$config['default']])
             ->setAutowired(true);
 
-        // Add shutdown handler if using DbDictionary
-        if ($factoryClass === DbDictionaryFactory::class) {
+        // Add shutdown handler if using DbDictionary or CldrDbDictionary
+        if ($factoryClass === DbDictionaryFactory::class || $factoryClass === CldrDbDictionaryFactory::class) {
             $builder->addDefinition($this->prefix('shutdownHandler'))
                 ->setFactory(ShutdownHandler::class, [
                     $this->prefix('@translator')
@@ -145,8 +146,9 @@ class Extension extends CompilerExtension
                 ->addSetup('setLogger', ['@logger']);
         }
 
-        // Setup shutdown handler for DbDictionary
-        if ($config['dictionary']['factory'] === DbDictionaryFactory::class
+        // Setup shutdown handler for DbDictionary and CldrDbDictionary
+        if (($config['dictionary']['factory'] === DbDictionaryFactory::class 
+            || $config['dictionary']['factory'] === CldrDbDictionaryFactory::class)
             && $builder->hasDefinition('application')) {
 
             $builder->getDefinition('application')
