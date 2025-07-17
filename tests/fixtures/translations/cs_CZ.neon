@@ -26,3 +26,6 @@ room_count_simple:
     few: "pokoje"
     many: "pokoje"
     other: "pokojů"
+
+# Named parameters example
+date_long_with_weekday: "{weekday}, {day}. {month} {year}"

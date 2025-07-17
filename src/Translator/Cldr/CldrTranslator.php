@@ -111,12 +111,24 @@ class CldrTranslator extends Translator
             }
         }
 
-        // Apply string formatting if we have parameters and it's not already handled by ICU
-        if (!empty($parameters) && !$this->isIcuFormatted($result)) {
+        // Check if the result contains ICU-style named parameters
+        if (!empty($parameters) && $this->isIcuFormatted($result)) {
+            // Use ICU message formatting for named parameters
+            $count = $parameters[0] ?? null;
+            if (is_numeric($count)) {
+                $result = $this->formatIcuMessage($result, $count, $parameters);
+            } else {
+                // If first parameter is not numeric, it might be an array of named parameters
+                // or we're just not using count-based pluralization
+                $result = $this->formatIcuMessage($result, null, $parameters);
+            }
+        } else if (!empty($parameters)) {
+            // Fall back to sprintf formatting for non-ICU strings
             $result = $this->applySprintfFormatting($result, $parameters);
         }
 
         // Replace {count} placeholders with actual count value for Latte compatibility
+        // This is a fallback for cases where ICU formatting didn't handle it
         if (!empty($parameters) && strpos($result, '{count}') !== false) {
             $count = $parameters[0] ?? 0;
             $result = str_replace('{count}', (string)$count, $result);

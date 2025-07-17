@@ -151,6 +151,36 @@ class LatteIntegrationTest extends TestCase
     }
 
     /**
+     * Test named parameters in Latte templates with English locale
+     */
+    public function testNamedParametersInLatte(): void
+    {
+        // Set translator locale to English
+        $this->translator->setLocale('en_US');
+
+        // Render the template with named parameters
+        $output = $this->latte->renderToString($this->templatesDir . '/date_test.latte');
+
+        // Verify the output contains the formatted date with named parameters
+        $this->assertEquals('Sunday, 24. August 2025', $output);
+    }
+
+    /**
+     * Test named parameters in Latte templates with Czech locale
+     */
+    public function testNamedParametersInLatteWithCzechLocale(): void
+    {
+        // Set translator locale to Czech
+        $this->translator->setLocale('cs_CZ');
+
+        // Render the template with named parameters
+        $output = $this->latte->renderToString($this->templatesDir . '/date_test_cs.latte');
+
+        // Verify the output contains the formatted date with named parameters
+        $this->assertEquals('Neděle, 24. srpna 2025', $output);
+    }
+
+    /**
      * Set up the translator
      */
     private function setupTranslator(): void
