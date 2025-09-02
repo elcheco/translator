@@ -23,6 +23,9 @@ composer test:demo          # Run demo test script
 # Run static analysis
 vendor/bin/phpstan analyze
 
+# Run PHPStan with specific levels
+vendor/bin/phpstan analyze --level=max
+
 # Run a single test file
 vendor/bin/phpunit tests/Integration/DbDictionaryTest.php
 

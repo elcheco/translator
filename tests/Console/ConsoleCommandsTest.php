@@ -90,7 +90,6 @@ class ConsoleCommandsTest extends TestCase
             'directory' => $this->translationsDir,
             'module' => 'TestModule',
             '--locale' => 'en_US',
-            '--mark-as-translated' => true,
         ]);
 
         // Assert command succeeded
@@ -118,7 +117,6 @@ class ConsoleCommandsTest extends TestCase
             SELECT * FROM translations WHERE key_id = %i
         ', $pluralKey['id'])->fetch();
         $this->assertNotNull($pluralTrans['plural_values']);
-        $this->assertEquals(1, $pluralTrans['is_translated']);
     }
 
     /**
@@ -378,7 +376,6 @@ class ConsoleCommandsTest extends TestCase
                 locale VARCHAR(10) NOT NULL,
                 value TEXT,
                 plural_values TEXT,
-                is_translated INTEGER DEFAULT 0,
                 is_approved INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -414,8 +411,8 @@ class ConsoleCommandsTest extends TestCase
             // Insert translations
             if ($keyData['type'] === 'plural') {
                 $this->connection->query('
-                    INSERT INTO translations (key_id, locale, plural_values, is_translated)
-                    VALUES (%i, %s, %s, 1)
+                    INSERT INTO translations (key_id, locale, plural_values)
+                    VALUES (%i, %s, %s)
                 ', $keyId, 'en_US', json_encode([
                     1 => 'You have %s message',
                     2 => 'You have %s messages'
@@ -423,8 +420,8 @@ class ConsoleCommandsTest extends TestCase
             } else {
                 $value = $keyData['key'] === 'welcome' ? 'Welcome' : 'Hello %s';
                 $this->connection->query('
-                    INSERT INTO translations (key_id, locale, value, is_translated)
-                    VALUES (%i, %s, %s, 1)
+                    INSERT INTO translations (key_id, locale, value)
+                    VALUES (%i, %s, %s)
                 ', $keyId, 'en_US', $value);
             }
         }

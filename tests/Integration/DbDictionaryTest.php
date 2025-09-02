@@ -131,8 +131,8 @@ class DbDictionaryTest extends TestCase
         $keyId = $this->connection->getInsertId();
 
         $this->connection->query('
-            INSERT INTO [translations] ([key_id], [locale], [plural_values], [is_translated])
-            VALUES (%i, %s, %s, 1)
+            INSERT INTO [translations] ([key_id], [locale], [plural_values])
+            VALUES (%i, %s, %s)
         ', $keyId, 'en_US', json_encode([
             'zero' => 'No items',
             'one' => 'One item',
@@ -202,8 +202,8 @@ class DbDictionaryTest extends TestCase
         $keyId = $this->connection->getInsertId();
 
         $this->connection->query('
-            INSERT INTO [translations] ([key_id], [locale], [value], [is_translated])
-            VALUES (%i, %s, %s, 1)
+            INSERT INTO [translations] ([key_id], [locale], [value])
+            VALUES (%i, %s, %s)
         ', $keyId, 'en_US', '<strong>Bold text</strong>');
 
         $factory = new DbDictionaryFactory($this->connection, 'TestModule');
@@ -252,7 +252,6 @@ class DbDictionaryTest extends TestCase
                 locale VARCHAR(10) NOT NULL,
                 value TEXT,
                 plural_values TEXT,
-                is_translated INTEGER DEFAULT 0,
                 is_approved INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -304,8 +303,8 @@ class DbDictionaryTest extends TestCase
 
         foreach ($translations as $trans) {
             $this->connection->query('
-                INSERT INTO translations (key_id, locale, value, plural_values, is_translated)
-                VALUES (%i, %s, %s, %s, 1)
+                INSERT INTO translations (key_id, locale, value, plural_values)
+                VALUES (%i, %s, %s, %s)
             ',
                 $trans['key_id'],
                 $trans['locale'],

@@ -262,7 +262,6 @@ items_count:
 ```bash
 php bin/console translations:import-neon /path/to/neon/files ModuleName \
     --locale=en_US \
-    --mark-as-translated \
     --mark-as-approved \
     --overwrite
 ```

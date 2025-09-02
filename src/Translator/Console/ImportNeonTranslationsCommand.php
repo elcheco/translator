@@ -45,7 +45,6 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
             ->addArgument('directory', InputArgument::REQUIRED, 'Directory containing NEON translation files')
             ->addArgument('module', InputArgument::REQUIRED, 'Translation module name to import into')
             ->addOption('locale', 'l', InputOption::VALUE_REQUIRED, 'Specific locale to import')
-            ->addOption('mark-as-translated', 't', InputOption::VALUE_NONE, 'Mark imported translations as translated')
             ->addOption('mark-as-approved', 'a', InputOption::VALUE_NONE, 'Mark imported translations as approved')
             ->addOption('overwrite', 'o', InputOption::VALUE_NONE, 'Overwrite existing translations');
     }
@@ -58,7 +57,6 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
         $directory = rtrim($input->getArgument('directory'), '/\\');
         $moduleName = $input->getArgument('module');
         $locale = $input->getOption('locale');
-        $markAsTranslated = $input->getOption('mark-as-translated');
         $markAsApproved = $input->getOption('mark-as-approved');
         $overwrite = $input->getOption('overwrite');
 
@@ -130,7 +128,6 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
                             $key,
                             $value,
                             $localeCode,
-                            $markAsTranslated,
                             $markAsApproved,
                             $overwrite
                         );
@@ -186,7 +183,6 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
         string $key,
         $value,
         string $locale,
-        bool $markAsTranslated,
         bool $markAsApproved,
         bool $overwrite
     ): string {
@@ -249,7 +245,6 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
             'locale' => $locale,
             'value' => $type !== 'plural' ? $textValue : null,
             'plural_values' => $type === 'plural' ? json_encode($pluralValues) : null,
-            'is_translated' => $markAsTranslated,
             'is_approved' => $markAsApproved,
         ];
 
