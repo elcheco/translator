@@ -1,0 +1,42 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use ElCheco\Translator\Console\ImportNeonTranslationsCommand;
+use ElCheco\Translator\Console\ExportNeonTranslationsCommand;
+use ElCheco\Translator\Console\ConvertToCldrCommand;
+use Dibi\Connection;
+
+// Create Symfony Console Application
+$console = new Application('ElCheco Translator Console', '2.0');
+
+// Configure database connection (adjust these settings for your database)
+$config = [
+    'driver'   => 'sqlite3', // or 'mysql', 'postgresql', etc.
+    'database' => __DIR__ . '/../var/translator.db', // adjust path as needed
+    // For MySQL/PostgreSQL, uncomment and configure:
+    // 'host'     => 'localhost',
+    // 'username' => 'your_username',
+    // 'password' => 'your_password',
+    // 'database' => 'your_database',
+];
+
+try {
+    $connection = new Connection($config);
+    
+    // Add commands
+    $console->add(new ImportNeonTranslationsCommand($connection));
+    $console->add(new ExportNeonTranslationsCommand($connection));
+    $console->add(new ConvertToCldrCommand($connection));
+    
+} catch (Exception $e) {
+    echo "Database connection failed: " . $e->getMessage() . "\n";
+    echo "Please configure the database connection in bin/console\n";
+    exit(1);
+}
+
+// Run the console
+$console->run();

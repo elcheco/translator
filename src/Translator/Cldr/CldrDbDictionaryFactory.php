@@ -18,15 +18,17 @@ final class CldrDbDictionaryFactory implements DictionaryFactoryInterface
     private Connection $connection;
     private string $module;
     private bool $trackUsage;
+    private ?string $file;
 
     /**
      * Constructor
      */
-    public function __construct(Connection $connection, string $module, bool $trackUsage = true)
+    public function __construct(Connection $connection, string $module, bool $trackUsage = true, ?string $file = null)
     {
         $this->connection = $connection;
         $this->module = $module;
         $this->trackUsage = $trackUsage;
+        $this->file = $file;
     }
 
     /**
@@ -40,7 +42,8 @@ final class CldrDbDictionaryFactory implements DictionaryFactoryInterface
             $locale,
             $this->module,
             $fallbackLocale,
-            $this->trackUsage
+            $this->trackUsage,
+            $this->file
         );
 
         // Then wrap it with CldrDbDictionary

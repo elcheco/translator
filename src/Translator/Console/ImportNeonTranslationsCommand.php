@@ -45,6 +45,7 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
             ->addArgument('directory', InputArgument::REQUIRED, 'Directory containing NEON translation files')
             ->addArgument('module', InputArgument::REQUIRED, 'Translation module name to import into')
             ->addOption('locale', 'l', InputOption::VALUE_REQUIRED, 'Specific locale to import')
+            ->addOption('file', 'f', InputOption::VALUE_REQUIRED, 'Translation keys file group within the module (translation_keys.file)', '')
             ->addOption('mark-as-approved', 'a', InputOption::VALUE_NONE, 'Mark imported translations as approved')
             ->addOption('overwrite', 'o', InputOption::VALUE_NONE, 'Overwrite existing translations');
     }
@@ -57,6 +58,7 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
         $directory = rtrim($input->getArgument('directory'), '/\\');
         $moduleName = $input->getArgument('module');
         $locale = $input->getOption('locale');
+        $fileGroup = (string)$input->getOption('file');
         $markAsApproved = $input->getOption('mark-as-approved');
         $overwrite = $input->getOption('overwrite');
 
@@ -125,6 +127,7 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
                     foreach ($translations as $key => $value) {
                         $result = $this->processTranslation(
                             $moduleId,
+                            $fileGroup,
                             $key,
                             $value,
                             $localeCode,
@@ -180,6 +183,7 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
      */
     private function processTranslation(
         int $moduleId,
+        string $file,
         string $key,
         $value,
         string $locale,
@@ -204,17 +208,17 @@ class ImportNeonTranslationsCommand extends Console\Command\Command
         // Check if key exists
         $keyRecord = $this->connection->query('
             SELECT [id] FROM [translation_keys]
-            WHERE [module_id] = %i AND [key] = %s
+            WHERE [module_id] = %i AND [file] = %s AND [key] = %s
             LIMIT 1
-        ', $moduleId, $key)->fetch();
+        ', $moduleId, $file, $key)->fetch();
 
         // Create or update key record
         if (!$keyRecord) {
             $this->connection->query('
                 INSERT INTO [translation_keys]
-                ([module_id], [key], [type])
-                VALUES (%i, %s, %s)
-            ', $moduleId, $key, $type);
+                ([module_id], [file], [key], [type])
+                VALUES (%i, %s, %s, %s)
+            ', $moduleId, $file, $key, $type);
             $keyId = (int)$this->connection->getInsertId();
         } else {
             $keyId = (int)$keyRecord['id'];

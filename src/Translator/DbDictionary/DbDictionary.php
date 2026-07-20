@@ -15,6 +15,7 @@ final class DbDictionary extends Dictionary
     private ?string $fallbackLocale;
     private string $module;
     private bool $trackUsage;
+    private ?string $file;
 
     /** @var array<string, int> */
     private array $usedKeys = [];
@@ -32,13 +33,15 @@ final class DbDictionary extends Dictionary
         string $locale,
         string $module,
         ?string $fallbackLocale = null,
-        bool $trackUsage = true
+        bool $trackUsage = true,
+        ?string $file = null
     ) {
         $this->connection = $connection;
         $this->locale = $locale;
         $this->module = $module;
         $this->fallbackLocale = $fallbackLocale;
         $this->trackUsage = $trackUsage;
+        $this->file = $file;
     }
 
     /**
@@ -100,11 +103,19 @@ final class DbDictionary extends Dictionary
 
             try {
                 foreach ($this->usedKeys as $key => $count) {
-                    $this->connection->query('
-                        UPDATE [translation_keys]
-                        SET [usage_count] = [usage_count] + %i
-                        WHERE [module_id] = %i AND [key] = %s
-                    ', $count, $moduleId, $key);
+                    if ($this->file !== null) {
+                        $this->connection->query('
+                            UPDATE [translation_keys]
+                            SET [usage_count] = [usage_count] + %i
+                            WHERE [module_id] = %i AND [file] = %s AND [key] = %s
+                        ', $count, $moduleId, $this->file, $key);
+                    } else {
+                        $this->connection->query('
+                            UPDATE [translation_keys]
+                            SET [usage_count] = [usage_count] + %i
+                            WHERE [module_id] = %i AND [key] = %s
+                        ', $count, $moduleId, $key);
+                    }
                 }
 
                 // Commit transaction
@@ -173,12 +184,21 @@ final class DbDictionary extends Dictionary
         $translations = [];
 
         try {
-            $rows = $this->connection->query('
-                SELECT k.key, k.type, t.value, t.plural_values
-                FROM [translation_keys] k
-                LEFT JOIN [translations] t ON k.id = t.key_id AND t.locale = %s
-                WHERE k.module_id = %i
-            ', $locale, $moduleId)->fetchAll();
+            if ($this->file !== null) {
+                $rows = $this->connection->query('
+                    SELECT k.key, k.type, t.value, t.plural_values
+                    FROM [translation_keys] k
+                    LEFT JOIN [translations] t ON k.id = t.key_id AND t.locale = %s
+                    WHERE k.module_id = %i AND k.file = %s
+                ', $locale, $moduleId, $this->file)->fetchAll();
+            } else {
+                $rows = $this->connection->query('
+                    SELECT k.key, k.type, t.value, t.plural_values
+                    FROM [translation_keys] k
+                    LEFT JOIN [translations] t ON k.id = t.key_id AND t.locale = %s
+                    WHERE k.module_id = %i
+                ', $locale, $moduleId)->fetchAll();
+            }
 
             foreach ($rows as $row) {
                 $key = $row['key'];

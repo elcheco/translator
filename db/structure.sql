@@ -16,6 +16,7 @@ CREATE TABLE `translation_modules` (
 CREATE TABLE `translation_keys` (
                                     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                                     `module_id` INT UNSIGNED NOT NULL,
+                                    `file` VARCHAR(100) NOT NULL DEFAULT '',
                                     `key` VARCHAR(255) NOT NULL,
                                     `type` ENUM('text', 'html', 'plural') NOT NULL DEFAULT 'text',
                                     `description` TEXT NULL,
@@ -24,7 +25,7 @@ CREATE TABLE `translation_keys` (
                                     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                     PRIMARY KEY (`id`),
-                                    UNIQUE INDEX `translation_keys_module_id_key_unique` (`module_id`, `key`),
+                                    UNIQUE INDEX `translation_keys_module_id_file_key_unique` (`module_id`, `file`, `key`),
                                     CONSTRAINT `translation_keys_module_id_foreign`
                                         FOREIGN KEY (`module_id`)
                                             REFERENCES `translation_modules` (`id`)

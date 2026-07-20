@@ -42,6 +42,7 @@ class ExportNeonTranslationsCommand extends Console\Command\Command
             ->addArgument('module', InputArgument::REQUIRED, 'Translation module name to export')
             ->addArgument('locale', InputArgument::REQUIRED, 'Locale to export (e.g., en_US, cs_CZ)')
             ->addOption('output-dir', 'o', InputOption::VALUE_REQUIRED, 'Directory to save the NEON file', './translations')
+            ->addOption('file', 'f', InputOption::VALUE_REQUIRED, 'Translation keys file group within the module (translation_keys.file)', '')
             ->addOption('include-keys', 'k', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Include only specific keys (can be specified multiple times)')
             ->addOption('include-untranslated', 'u', InputOption::VALUE_NONE, 'Include keys that don\'t have translations for the specified locale');
     }
@@ -54,6 +55,7 @@ class ExportNeonTranslationsCommand extends Console\Command\Command
         $moduleName = $input->getArgument('module');
         $locale = $input->getArgument('locale');
         $outputDir = rtrim($input->getOption('output-dir'), '/\\');
+        $file = (string)$input->getOption('file');
         $includeKeys = $input->getOption('include-keys');
         $includeUntranslated = $input->getOption('include-untranslated');
 
@@ -74,7 +76,7 @@ class ExportNeonTranslationsCommand extends Console\Command\Command
         }
 
         // Get translations from the database
-        $translations = $this->getTranslations($moduleId, $locale, $includeKeys, $includeUntranslated);
+        $translations = $this->getTranslations($moduleId, $file, $locale, $includeKeys, $includeUntranslated);
         if (empty($translations)) {
             $io->warning("No translations found for module '$moduleName' and locale '$locale'.");
             return Console\Command\Command::FAILURE;
@@ -120,16 +122,18 @@ class ExportNeonTranslationsCommand extends Console\Command\Command
      * Get translations from database
      *
      * @param int $moduleId
+     * @param string $file
      * @param string $locale
      * @param array $includeKeys
      * @param bool $includeUntranslated
      * @return array<string, mixed> Associative array of key => value translations
      */
-    private function getTranslations(int $moduleId, string $locale, array $includeKeys, bool $includeUntranslated): array
+    private function getTranslations(int $moduleId, string $file, string $locale, array $includeKeys, bool $includeUntranslated): array
     {
         $query = $this->connection->select('k.key, k.type, t.value, t.plural_values')
             ->from('[translation_keys] k')
-            ->where('k.module_id = %i', $moduleId);
+            ->where('k.module_id = %i', $moduleId)
+            ->where('k.file = %s', $file);
 
         // Filter by specific keys if provided
         if (!empty($includeKeys)) {

@@ -358,6 +358,7 @@ class ConsoleCommandsTest extends TestCase
             CREATE TABLE translation_keys (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 module_id INTEGER NOT NULL,
+                file VARCHAR(100) NOT NULL DEFAULT "",
                 key VARCHAR(255) NOT NULL,
                 type VARCHAR(10) DEFAULT "text",
                 format_type VARCHAR(10) DEFAULT "sprintf",

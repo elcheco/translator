@@ -166,6 +166,7 @@ class CldrDbDictionaryTest extends TestCase
             CREATE TABLE [translation_keys] (
                 [id] INTEGER PRIMARY KEY AUTOINCREMENT,
                 [module_id] INTEGER NOT NULL,
+                [file] TEXT NOT NULL DEFAULT "",
                 [key] TEXT NOT NULL,
                 [type] TEXT NOT NULL DEFAULT "text",
                 [usage_count] INTEGER NOT NULL DEFAULT 0,
