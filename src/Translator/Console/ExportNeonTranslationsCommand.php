@@ -144,7 +144,8 @@ class ExportNeonTranslationsCommand extends Console\Command\Command
             $query->leftJoin('[translations] t')->on('k.id = t.key_id AND t.locale = %s', $locale);
         } else {
             $query->join('[translations] t')->on('k.id = t.key_id AND t.locale = %s', $locale)
-                ->where('t.value IS NOT NULL OR t.plural_values IS NOT NULL');
+                // Parentheses keep the OR from bypassing the module/file conditions
+                ->where('(t.value IS NOT NULL OR t.plural_values IS NOT NULL)');
         }
 
         $rows = $query->fetchAll();

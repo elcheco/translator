@@ -300,6 +300,44 @@ class ConsoleCommandsTest extends TestCase
     }
 
     /**
+     * Test export does not leak plural keys of another module
+     */
+    public function testExportIgnoresOtherModules(): void
+    {
+        $this->insertTestData();
+
+        // Same key in another module stored as plural
+        $this->connection->query('INSERT INTO translation_modules (name) VALUES (%s)', 'OtherModule');
+        $otherModuleId = $this->connection->getInsertId();
+        $this->connection->query('
+            INSERT INTO translation_keys (module_id, key, type)
+            VALUES (%i, %s, %s)
+        ', $otherModuleId, 'welcome', 'plural');
+        $this->connection->query('
+            INSERT INTO translations (key_id, locale, plural_values)
+            VALUES (%i, %s, %s)
+        ', $this->connection->getInsertId(), 'en_US', json_encode(['one' => '# welcome', 'other' => '# welcomes']));
+
+        $application = new Application();
+        $command = new ExportNeonTranslationsCommand($this->connection);
+        $application->add($command);
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'module' => 'TestModule',
+            'locale' => 'en_US',
+            '--output-dir' => $this->outputDir,
+        ]);
+
+        $this->assertEquals(0, $commandTester->getStatusCode());
+
+        $translations = Neon::decode(file_get_contents($this->outputDir . '/en_US.neon'));
+
+        $this->assertSame('Welcome', $translations['welcome']);
+        $this->assertCount(3, $translations);
+    }
+
+    /**
      * Test dry-run mode
      */
     public function testDryRunMode(): void
