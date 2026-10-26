@@ -89,7 +89,6 @@ final class CldrDbDictionary implements DictionaryInterface
 
         // Get the messages from DbDictionary
         $messagesProperty = $reflection->getParentClass()->getProperty('messages');
-        $messagesProperty->setAccessible(true);
         $messages = $messagesProperty->getValue($this->dbDictionary);
 
         // Process messages to build metadata

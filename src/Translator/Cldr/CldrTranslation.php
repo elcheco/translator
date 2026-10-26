@@ -235,7 +235,6 @@ class CldrTranslation extends Translation
         // Use reflection to access protected property from parent
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('locale');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 

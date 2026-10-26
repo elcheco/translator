@@ -32,7 +32,6 @@ class ShutdownHandler
             // Access the wrapped DbDictionary using reflection
             $reflection = new \ReflectionClass($dictionary);
             $dbDictionaryProperty = $reflection->getProperty('dbDictionary');
-            $dbDictionaryProperty->setAccessible(true);
             $dbDictionary = $dbDictionaryProperty->getValue($dictionary);
             
             if ($dbDictionary instanceof DbDictionary) {

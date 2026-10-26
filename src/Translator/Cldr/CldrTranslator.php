@@ -297,7 +297,6 @@ class CldrTranslator extends Translator
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('locale');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 
@@ -310,7 +309,6 @@ class CldrTranslator extends Translator
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('fallBackLocale');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 
@@ -323,7 +321,6 @@ class CldrTranslator extends Translator
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('dictionaryFactory');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 
@@ -336,7 +333,6 @@ class CldrTranslator extends Translator
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('dictionary');
-        $property->setAccessible(true);
         $property->setValue($this, $dictionary);
     }
 
@@ -349,7 +345,6 @@ class CldrTranslator extends Translator
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('logger');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 
@@ -362,7 +357,6 @@ class CldrTranslator extends Translator
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('debugMode');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 }

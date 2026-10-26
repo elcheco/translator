@@ -67,13 +67,11 @@ class CldrDbDictionaryTest extends TestCase
         // Get the dictionary to force it to be created
         $reflection = new \ReflectionClass($translator);
         $getDictionaryMethod = $reflection->getMethod('getDictionary');
-        $getDictionaryMethod->setAccessible(true);
         $dictionary = $getDictionaryMethod->invoke($translator);
 
         // Get the underlying DbDictionary
         $reflection = new \ReflectionClass($dictionary);
         $dbDictionaryProperty = $reflection->getProperty('dbDictionary');
-        $dbDictionaryProperty->setAccessible(true);
         $dbDictionary = $dbDictionaryProperty->getValue($dictionary);
 
         // Explicitly unset the dictionary to trigger the destructor

@@ -251,7 +251,6 @@ class CldrNeonDictionary extends NeonDictionary
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('filename');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 
@@ -264,7 +263,6 @@ class CldrNeonDictionary extends NeonDictionary
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('cacheFilename');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 
@@ -277,7 +275,6 @@ class CldrNeonDictionary extends NeonDictionary
     {
         $reflection = new \ReflectionClass(parent::class);
         $property = $reflection->getProperty('fallbackFilename');
-        $property->setAccessible(true);
         return $property->getValue($this);
     }
 }
